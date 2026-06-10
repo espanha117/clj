@@ -63,15 +63,16 @@
                         <label for="campo-email" class="block text-sm font-medium text-slate-400 mb-1.5 ml-1">Usuário (E-mail)</label>
                         <div class="relative">
                             <input 
-                                type="email" 
-                                id="campo-email" 
+                                type="email"
+                                id="campo-email"
                                 x-model="email"
                                 required
+                                autocomplete="email"
                                 class="w-full pl-4 pr-10 py-3 rounded-xl border border-slate-700/50 focus:ring-2 focus:ring-slate-400/30 focus:border-slate-400 outline-none transition-all text-slate-200 bg-slate-950/50 placeholder-slate-600 shadow-inner"
                                 placeholder="paroquia@clj.diocesano"
                             >
                             <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-slate-500">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
                             </div>
                         </div>
                     </div>
@@ -80,10 +81,11 @@
                         <label for="campo-senha" class="block text-sm font-medium text-slate-400 mb-1.5 ml-1">Senha</label>
                         <div class="relative">
                             <input 
-                                type="password" 
-                                id="campo-senha" 
+                                type="password"
+                                id="campo-senha"
                                 x-model="password"
                                 required
+                                autocomplete="current-password"
                                 class="w-full pl-4 pr-10 py-3 rounded-xl border border-slate-700/50 focus:ring-2 focus:ring-slate-400/30 focus:border-slate-400 outline-none transition-all text-slate-200 bg-slate-950/50 placeholder-slate-600 shadow-inner"
                                 placeholder="••••••••"
                             >
@@ -122,10 +124,8 @@
     <script type="module">
         import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
         import Alpine from 'https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/module.esm.js';
+        import { supabaseUrl, supabaseKey } from './config.js';
 
-        // URL corrigida (sem o /rest/v1/)
-        const supabaseUrl = 'https://blxkymzlklcebwigfynv.supabase.co';
-        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJseGt5bXpsa2xjZWJ3aWdmeW52Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODEwMzQ0MjIsImV4cCI6MjA5NjYxMDQyMn0.A3z6ECZU190Ye7xrzfq1AdRX_Mf-V_b2ipwuIF4Mi2s';
         const supabase = createClient(supabaseUrl, supabaseKey);
 
         Alpine.data('loginForm', () => ({

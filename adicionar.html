@@ -110,9 +110,8 @@
     <script type="module">
         import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
         import Alpine from 'https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/module.esm.js';
+        import { supabaseUrl, supabaseKey } from './config.js';
 
-        const supabaseUrl = 'https://blxkymzlklcebwigfynv.supabase.co';
-        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJseGt5bXpsa2xjZWJ3aWdmeW52Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODEwMzQ0MjIsImV4cCI6MjA5NjYxMDQyMn0.A3z6ECZU190Ye7xrzfq1AdRX_Mf-V_b2ipwuIF4Mi2s';
         const supabase = createClient(supabaseUrl, supabaseKey);
 
         Alpine.data('addMemberForm', () => ({
@@ -153,11 +152,12 @@
                     if (error) throw error;
 
                     // Limpa o formulário após o sucesso
-                    this.mensagem = { texto: 'Membro do PSP cadastrado com sucesso!', erro: false };
+                    this.mensagem = { texto: 'Membro do PSP cadastrado com sucesso! Redirecionando...', erro: false };
                     this.form.nome = '';
                     this.form.cidade_id = '';
                     this.form.cargo = '';
                     this.form.telefone = '';
+                    setTimeout(() => { window.location.href = 'hub.html'; }, 2000);
                     
                 } catch (err) {
                     console.error(err);

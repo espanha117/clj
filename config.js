@@ -1,0 +1,2 @@
+export const supabaseUrl = 'https://blxkymzlklcebwigfynv.supabase.co';
+export const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJseGt5bXpsa2xjZWJ3aWdmeW52Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODEwMzQ0MjIsImV4cCI6MjA5NjYxMDQyMn0.A3z6ECZU190Ye7xrzfq1AdRX_Mf-V_b2ipwuIF4Mi2s';
