@@ -214,8 +214,14 @@
                 const { data } = await query;
                 if (data) {
                     this.cidadesList = data;
+                    const params = new URLSearchParams(window.location.search);
+                    const cidadeParam = params.get('cidade');
                     if (!this.isAdmin && data.length > 0) {
                         await this.carregarMembros(data[0]);
+                    } else if (this.isAdmin && cidadeParam) {
+                        this.cidadeIdSelecionada = cidadeParam;
+                        const cidade = data.find(c => c.id === cidadeParam);
+                        if (cidade) await this.carregarMembros(cidade);
                     }
                 }
             },
@@ -243,9 +249,9 @@
 
             sortMembros(lista) {
                 const rank = c => {
-                    const l = c.toLowerCase();
+                    const l = c.toLowerCase().trim();
                     if (l === 'presidente') return 0;
-                    if (l.includes('vice')) return 1;
+                    if (l === 'vice presidente' || l === 'vice-presidente') return 1;
                     return 2;
                 };
                 return [...lista].sort((a, b) => {

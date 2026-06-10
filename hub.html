@@ -143,7 +143,14 @@
                             <div class="flex flex-col sm:flex-row sm:items-center justify-between p-4 rounded-xl border border-slate-700/50 bg-slate-800/30 hover:bg-slate-800/60 transition-colors gap-4">
                                 <div>
                                     <span class="inline-block px-2.5 py-1 rounded-md bg-slate-700/50 text-xs font-medium text-slate-300 mb-2 border border-slate-600/50" x-text="membro.cargo"></span>
-                                    <h4 class="text-lg font-semibold text-slate-200" x-text="membro.nome"></h4>
+                                    <div class="flex items-center gap-2">
+                                        <h4 class="text-lg font-semibold text-slate-200" x-text="membro.nome"></h4>
+                                        <a :href="`editar.html?cidade=${paroquiaSelecionada?.id}`"
+                                           class="p-1 rounded text-slate-600 hover:text-slate-300 transition-colors shrink-0"
+                                           title="Editar membros">
+                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                                        </a>
+                                    </div>
                                     <p class="text-sm text-slate-400 mt-0.5" x-text="formatarTelefone(membro.telefone)"></p>
                                 </div>
 
@@ -243,9 +250,9 @@
 
             sortMembros(lista) {
                 const rank = c => {
-                    const l = c.toLowerCase();
+                    const l = c.toLowerCase().trim();
                     if (l === 'presidente') return 0;
-                    if (l.includes('vice')) return 1;
+                    if (l === 'vice presidente' || l === 'vice-presidente') return 1;
                     return 2;
                 };
                 return [...lista].sort((a, b) => {
@@ -257,8 +264,8 @@
             },
 
             ePresOuVice(cargo) {
-                const c = cargo.toLowerCase();
-                return c === 'presidente' || c.includes('vice');
+                const c = cargo.toLowerCase().trim();
+                return c === 'presidente' || c === 'vice presidente' || c === 'vice-presidente';
             },
 
             async moverMembro(membro, direcao) {
@@ -269,16 +276,14 @@
 
                 const a = outros[idx];
                 const b = outros[swapIdx];
-                const ordemA = a.ordem ?? idx * 10;
-                const ordemB = b.ordem ?? swapIdx * 10;
 
                 await Promise.all([
-                    supabase.from('membros_psp').update({ ordem: ordemB }).eq('id', a.id),
-                    supabase.from('membros_psp').update({ ordem: ordemA }).eq('id', b.id)
+                    supabase.from('membros_psp').update({ ordem: swapIdx * 10 }).eq('id', a.id),
+                    supabase.from('membros_psp').update({ ordem: idx * 10 }).eq('id', b.id)
                 ]);
 
-                a.ordem = ordemB;
-                b.ordem = ordemA;
+                a.ordem = swapIdx * 10;
+                b.ordem = idx * 10;
                 this.membros = this.sortMembros(this.membros);
             },
 
