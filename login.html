@@ -148,6 +148,7 @@
 
                     if (loginCorreto) {
                         localStorage.setItem('clj_auth', 'true');
+                        localStorage.setItem('clj_user', this.email);
                         window.location.href = 'hub.html';
                     } else {
                         this.error = 'Credenciais inválidas. Verifique seu usuário e senha.';
