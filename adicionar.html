@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Novo Membro - CLJ Diocese de Frederico Westphalen</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: { colors: { slate: { 850: '#151e2e', 950: '#0a0f1a' } } }
+            }
+        }
+    </script>
+</head>
+<body class="bg-slate-950 font-sans antialiased text-slate-200 relative min-h-screen">
+
+    <div class="fixed inset-0 opacity-[0.15] pointer-events-none z-0" 
+         style="background-image: url('data:image/svg+xml,%3Csvg width=\'24\' height=\'24\' viewBox=\'0 0 24 24\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Ccircle cx=\'2\' cy=\'2\' r=\'1\' fill=\'%23ffffff\'/%3E%3C/svg%3E');">
+    </div>
+    <div class="fixed top-[-20%] left-[-10%] w-96 h-96 bg-slate-400/10 rounded-full blur-[120px] pointer-events-none z-0"></div>
+    <div class="fixed bottom-[-20%] right-[-10%] w-[500px] h-[500px] bg-slate-300/5 rounded-full blur-[150px] pointer-events-none z-0"></div>
+
+    <header class="relative z-10 bg-slate-900/60 backdrop-blur-md border-b border-slate-800 sticky top-0">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 h-20 flex items-center justify-between">
+            <button onclick="window.location.href='hub.html'" class="text-sm font-medium text-slate-400 hover:text-white transition-colors flex items-center gap-2">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                Voltar ao Hub
+            </button>
+            <div class="flex items-center gap-3">
+                <img src="assets/logo diocese sem fundo.png" alt="Logo CLJ" class="h-10 w-auto object-contain">
+            </div>
+        </div>
+    </header>
+
+    <main class="relative z-10 max-w-2xl mx-auto px-4 py-12" x-data="addMemberForm()">
+        
+        <div class="bg-slate-900/60 backdrop-blur-xl rounded-3xl shadow-2xl border border-slate-700/50 p-8 sm:p-10">
+            <h2 class="text-2xl font-bold text-slate-100 mb-2">Cadastrar Membro do PSP</h2>
+            <p class="text-slate-400 text-sm mb-8">Preencha os dados para adicionar um novo contato ao diretório diocesano.</p>
+
+            <div x-show="mensagem.texto" 
+                 x-transition
+                 :class="mensagem.erro ? 'bg-red-500/10 border-red-500/20 text-red-400' : 'bg-green-500/10 border-green-500/20 text-green-400'"
+                 class="mb-6 p-4 rounded-xl border text-sm flex items-center" 
+                 style="display: none;">
+                <span x-text="mensagem.texto"></span>
+            </div>
+
+            <form @submit.prevent="salvarMembro" class="space-y-6">
+                
+                <div>
+                    <label for="nome" class="block text-sm font-medium text-slate-400 mb-2">Nome Completo</label>
+                    <input type="text" id="nome" x-model="form.nome" required
+                           class="w-full px-4 py-3 rounded-xl border border-slate-700/50 focus:ring-2 focus:ring-slate-400/30 focus:border-slate-400 outline-none transition-all text-slate-200 bg-slate-950/50 placeholder-slate-600 shadow-inner"
+                           placeholder="Ex: João da Silva">
+                </div>
+
+                <div>
+                    <label for="cidade" class="block text-sm font-medium text-slate-400 mb-2">Paróquia / Cidade</label>
+                    <div class="relative">
+                        <select id="cidade" x-model="form.cidade_id" required
+                                class="w-full px-4 py-3 rounded-xl border border-slate-700/50 focus:ring-2 focus:ring-slate-400/30 focus:border-slate-400 outline-none transition-all text-slate-200 bg-slate-950/50 appearance-none shadow-inner cursor-pointer">
+                            <option value="" disabled selected>Selecione a paróquia...</option>
+                            <template x-for="cidade in cidadesList" :key="cidade.id">
+                                <option :value="cidade.id" x-text="`${cidade.nome} - ${cidade.paroquia}`"></option>
+                            </template>
+                        </select>
+                        <div class="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none text-slate-500">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                    <div>
+                        <label for="cargo" class="block text-sm font-medium text-slate-400 mb-2">Função / Cargo</label>
+                        <input type="text" id="cargo" x-model="form.cargo" required
+                               class="w-full px-4 py-3 rounded-xl border border-slate-700/50 focus:ring-2 focus:ring-slate-400/30 focus:border-slate-400 outline-none transition-all text-slate-200 bg-slate-950/50 placeholder-slate-600 shadow-inner"
+                               placeholder="Ex: Presidente">
+                    </div>
+
+                    <div>
+                        <label for="telefone" class="block text-sm font-medium text-slate-400 mb-2">WhatsApp</label>
+                        <input type="tel" id="telefone" x-model="form.telefone" required
+                               class="w-full px-4 py-3 rounded-xl border border-slate-700/50 focus:ring-2 focus:ring-slate-400/30 focus:border-slate-400 outline-none transition-all text-slate-200 bg-slate-950/50 placeholder-slate-600 shadow-inner"
+                               placeholder="Ex: 5551999999999">
+                    </div>
+                </div>
+
+                <div class="pt-6 flex gap-4">
+                    <button type="button" onclick="window.location.href='hub.html'" class="flex-1 px-4 py-3.5 rounded-xl border border-slate-700 hover:bg-slate-800 text-slate-300 font-semibold transition-colors text-center">
+                        Cancelar
+                    </button>
+                    <button type="submit" :disabled="isLoading" class="flex-1 relative bg-slate-200 hover:bg-white text-slate-900 font-bold py-3.5 px-4 rounded-xl transition-all flex justify-center items-center disabled:opacity-70 disabled:cursor-not-allowed group overflow-hidden">
+                        <div class="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/40 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></div>
+                        <span x-show="!isLoading" class="relative z-10">Salvar Contato</span>
+                        <svg x-show="isLoading" style="display: none;" class="animate-spin -ml-1 mr-3 h-5 w-5 text-slate-900 relative z-10" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        <span x-show="isLoading" style="display: none;" class="relative z-10">Salvando...</span>
+                    </button>
+                </div>
+
+            </form>
+        </div>
+    </main>
+
+    <script type="module">
+        import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+        import Alpine from 'https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/module.esm.js';
+
+        const supabaseUrl = 'https://blxkymzlklcebwigfynv.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJseGt5bXpsa2xjZWJ3aWdmeW52Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODEwMzQ0MjIsImV4cCI6MjA5NjYxMDQyMn0.A3z6ECZU190Ye7xrzfq1AdRX_Mf-V_b2ipwuIF4Mi2s';
+        const supabase = createClient(supabaseUrl, supabaseKey);
+
+        Alpine.data('addMemberForm', () => ({
+            cidadesList: [],
+            isLoading: false,
+            mensagem: { texto: '', erro: false },
+            form: {
+                nome: '',
+                cidade_id: '',
+                cargo: '',
+                telefone: ''
+            },
+
+            async init() {
+                // Carrega as cidades ordenadas por nome assim que a tela abre
+                const { data, error } = await supabase
+                    .from('cidades')
+                    .select('id, nome, paroquia')
+                    .order('nome', { ascending: true });
+                
+                if (!error && data) {
+                    this.cidadesList = data;
+                }
+            },
+
+            async salvarMembro() {
+                this.isLoading = true;
+                this.mensagem = { texto: '', erro: false };
+
+                try {
+                    const { error } = await supabase.from('membros_psp').insert([{
+                        nome: this.form.nome,
+                        cidade_id: this.form.cidade_id,
+                        cargo: this.form.cargo,
+                        telefone: this.form.telefone
+                    }]);
+
+                    if (error) throw error;
+
+                    // Limpa o formulário após o sucesso
+                    this.mensagem = { texto: 'Membro do PSP cadastrado com sucesso!', erro: false };
+                    this.form.nome = '';
+                    this.form.cidade_id = '';
+                    this.form.cargo = '';
+                    this.form.telefone = '';
+                    
+                } catch (err) {
+                    console.error(err);
+                    this.mensagem = { texto: 'Erro ao cadastrar. Verifique a conexão.', erro: true };
+                } finally {
+                    this.isLoading = false;
+                }
+            }
+        }));
+
+        window.Alpine = Alpine;
+        Alpine.start();
+    </script>
+</body>
+</html>

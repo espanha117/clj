@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hub - CLJ Diocese de Frederico Westphalen</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        slate: {
+                            850: '#151e2e',
+                            950: '#0a0f1a',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-slate-950 font-sans antialiased text-slate-200 relative min-h-screen">
+
+    <div class="fixed inset-0 opacity-[0.15] pointer-events-none z-0" 
+         style="background-image: url('data:image/svg+xml,%3Csvg width=\'24\' height=\'24\' viewBox=\'0 0 24 24\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Ccircle cx=\'2\' cy=\'2\' r=\'1\' fill=\'%23ffffff\'/%3E%3C/svg%3E');">
+    </div>
+    <div class="fixed top-[-20%] left-[-10%] w-96 h-96 bg-slate-400/10 rounded-full blur-[120px] pointer-events-none z-0"></div>
+    <div class="fixed bottom-[-20%] right-[-10%] w-[500px] h-[500px] bg-slate-300/5 rounded-full blur-[150px] pointer-events-none z-0"></div>
+
+    <header class="relative z-10 bg-slate-900/60 backdrop-blur-md border-b border-slate-800 sticky top-0">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+            <div class="flex items-center gap-4">
+                <img src="assets/logo diocese sem fundo.png" alt="Logo CLJ" class="h-12 w-auto object-contain">
+                <div>
+                    <h1 class="text-lg font-bold text-slate-100 leading-tight">Painel Diocesano</h1>
+                    <p class="text-xs text-slate-400 uppercase tracking-wider">Secretariado</p>
+                </div>
+            </div>
+            
+            <button onclick="logout()" class="text-sm font-medium text-slate-400 hover:text-white transition-colors flex items-center gap-2">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+                Sair
+            </button>
+        </div>
+    </header>
+
+    <main class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10" x-data="hubData()">
+        
+        <div class="mb-8">
+            <h2 class="text-2xl font-semibold text-slate-200">Paróquias</h2>
+            <p class="text-slate-400 text-sm mt-1">Selecione uma cidade para gerenciar os contatos do PSP.</p>
+        </div>
+
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 sm:gap-6">
+            <template x-for="paroquia in paroquias" :key="paroquia.sigla">
+                <button 
+                    @click="abrirParoquia(paroquia)"
+                    class="group flex flex-col text-left bg-slate-900/60 backdrop-blur-sm border border-slate-800 rounded-2xl overflow-hidden hover:border-slate-600 transition-all duration-300 hover:shadow-[0_0_25px_rgba(255,255,255,0.05)] hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-slate-500"
+                >
+                    <div class="w-full aspect-[4/3] bg-slate-950 relative flex items-center justify-center overflow-hidden border-b border-slate-800">
+                        <span class="absolute text-4xl font-bold text-slate-800 uppercase tracking-widest" x-text="paroquia.sigla"></span>
+                        <img 
+                            :src="`assets/${paroquia.sigla}.jpg`" 
+                            :alt="paroquia.cidade" 
+                            class="absolute inset-0 w-full h-full object-cover z-10 opacity-70 group-hover:opacity-100 transition-opacity duration-500 group-hover:scale-105"
+                            onerror="this.style.display='none'"
+                        >
+                        <div class="absolute inset-0 bg-gradient-to-t from-slate-900/80 to-transparent z-20"></div>
+                    </div>
+                    <div class="p-4 sm:p-5 flex-1 flex flex-col justify-start">
+                        <h3 class="text-base sm:text-lg font-semibold text-slate-200 group-hover:text-white transition-colors leading-tight" x-text="paroquia.cidade"></h3>
+                        <p class="text-xs text-slate-400 mt-1.5 line-clamp-2" x-text="paroquia.padroeiro"></p>
+                    </div>
+                </button>
+            </template>
+        </div>
+
+        </div>
+
+        <div class="mt-12 mb-4 flex justify-center">
+            <button 
+                onclick="window.location.href='adicionar.html'"
+                class="group relative inline-flex items-center gap-3 px-8 py-4 bg-slate-200 hover:bg-white text-slate-900 font-bold rounded-2xl transition-all duration-300 shadow-[0_0_20px_rgba(255,255,255,0.05)] hover:shadow-[0_0_30px_rgba(255,255,255,0.15)] hover:-translate-y-1 overflow-hidden"
+            >
+                <div class="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/40 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></div>
+                
+                <svg class="w-6 h-6 relative z-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"></path>
+                </svg>
+                <span class="relative z-10 tracking-wide">Adicionar Novo Membro</span>
+            </button>
+        </div>
+
+
+        <div x-show="modalAberto" style="display: none;" class="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6" x-transition.opacity>
+            <div class="absolute inset-0 bg-slate-950/80 backdrop-blur-sm" @click="fecharModal()"></div>
+            
+            <div class="relative w-full max-w-2xl bg-slate-900 border border-slate-700/50 rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]"
+                 x-show="modalAberto" 
+                 x-transition:enter="transition ease-out duration-300"
+                 x-transition:enter-start="opacity-0 translate-y-8"
+                 x-transition:enter-end="opacity-100 translate-y-0"
+                 x-transition:leave="transition ease-in duration-200"
+                 x-transition:leave-start="opacity-100 translate-y-0"
+                 x-transition:leave-end="opacity-0 translate-y-8">
+                
+                <div class="px-6 py-5 border-b border-slate-800 flex items-center justify-between bg-slate-900/50">
+                    <div>
+                        <h3 class="text-xl font-bold text-white" x-text="paroquiaSelecionada?.cidade"></h3>
+                        <p class="text-sm text-slate-400" x-text="paroquiaSelecionada?.padroeiro"></p>
+                    </div>
+                    <button @click="fecharModal()" class="text-slate-400 hover:text-white transition-colors p-2 rounded-lg hover:bg-slate-800">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                    </button>
+                </div>
+
+                <div class="p-6 overflow-y-auto flex-1">
+                    
+                    <div x-show="carregandoMembros" class="flex flex-col items-center justify-center py-10">
+                        <svg class="animate-spin h-8 w-8 text-slate-500 mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        <p class="text-slate-400 text-sm">Buscando contatos...</p>
+                    </div>
+
+                    <div x-show="!carregandoMembros && membros.length === 0" class="text-center py-10" style="display: none;">
+                        <svg class="w-12 h-12 text-slate-700 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                        <p class="text-slate-400">Nenhum membro do PSP cadastrado para esta cidade.</p>
+                    </div>
+
+                    <div x-show="!carregandoMembros && membros.length > 0" class="space-y-3" style="display: none;">
+                        <template x-for="membro in membros" :key="membro.id">
+                            <div class="flex flex-col sm:flex-row sm:items-center justify-between p-4 rounded-xl border border-slate-700/50 bg-slate-800/30 hover:bg-slate-800/60 transition-colors gap-4">
+                                <div>
+                                    <span class="inline-block px-2.5 py-1 rounded-md bg-slate-700/50 text-xs font-medium text-slate-300 mb-2 border border-slate-600/50" x-text="membro.cargo"></span>
+                                    <h4 class="text-lg font-semibold text-slate-200" x-text="membro.nome"></h4>
+                                    <p class="text-sm text-slate-400 mt-0.5" x-text="formatarTelefone(membro.telefone)"></p>
+                                </div>
+                                
+                                <a :href="`https://wa.me/${limparTelefone(membro.telefone)}`" target="_blank" class="shrink-0 flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-[#25D366]/10 hover:bg-[#25D366]/20 text-[#25D366] font-medium transition-colors border border-[#25D366]/20">
+                                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 00-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
+                                    Conversar
+                                </a>
+                            </div>
+                        </template>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <script type="module">
+        import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+        import Alpine from 'https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/module.esm.js';
+
+        // Conexão com o Supabase
+        const supabaseUrl = 'https://blxkymzlklcebwigfynv.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJseGt5bXpsa2xjZWJ3aWdmeW52Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODEwMzQ0MjIsImV4cCI6MjA5NjYxMDQyMn0.A3z6ECZU190Ye7xrzfq1AdRX_Mf-V_b2ipwuIF4Mi2s';
+        const supabase = createClient(supabaseUrl, supabaseKey);
+
+        // Função de Logout fora do Alpine para o cabeçalho usar
+        window.logout = () => {
+            localStorage.removeItem('clj_auth');
+            window.location.href = 'index.html'; // Volta pro login
+        };
+
+        // Bloqueio de acesso direto sem login
+    if (!localStorage.getItem('clj_auth')) {
+        window.location.href = 'index.html';
+    }
+
+        Alpine.data('hubData', () => ({
+            paroquias: [], // Agora a lista começa vazia e é preenchida pelo banco
+            modalAberto: false,
+            paroquiaSelecionada: null,
+            membros: [],
+            carregandoMembros: false,
+
+            // A função init() roda automaticamente quando a tela abre
+            async init() {
+                try {
+                    const { data, error } = await supabase
+                        .from('cidades')
+                        .select('*')
+                        .order('nome', { ascending: true }); // Carrega tudo do banco!
+
+                    if (!error && data) {
+                        // Mapeia os dados do banco para o formato que a tela espera
+                        this.paroquias = data.map(c => ({
+                            id: c.id,
+                            cidade: c.nome,
+                            padroeiro: c.paroquia,
+                            sigla: c.sigla
+                        }));
+                    }
+                } catch (err) {
+                    console.error("Erro ao carregar cidades:", err);
+                }
+            },
+
+            async abrirParoquia(paroquia) {
+                this.paroquiaSelecionada = paroquia;
+                this.modalAberto = true;
+                this.carregandoMembros = true;
+                this.membros = [];
+
+                try {
+                    // Como a paróquia já tem o ID oficial do banco, fazemos a busca direto!
+                    const { data: membrosData, error: membrosError } = await supabase
+                        .from('membros_psp')
+                        .select('id, nome, cargo, telefone')
+                        .eq('cidade_id', paroquia.id); // Usa o ID direto
+
+                    if (membrosError) throw membrosError;
+
+                    if (membrosData) {
+                        this.membros = membrosData;
+                    }
+
+                } catch (error) {
+                    console.error("Erro ao buscar contatos:", error);
+                } finally {
+                    this.carregandoMembros = false;
+                }
+            },
+
+            fecharModal() {
+                this.modalAberto = false;
+                setTimeout(() => {
+                    this.paroquiaSelecionada = null;
+                    this.membros = [];
+                }, 300);
+            },
+
+            limparTelefone(telefone) {
+                return telefone.replace(/\D/g, '');
+            },
+
+            formatarTelefone(telefone) {
+                const num = this.limparTelefone(telefone);
+                if (num.length >= 10) {
+                    let ddd = num.substring(0, 2);
+                    if (ddd === '55' && num.length > 11) {
+                        ddd = num.substring(2, 4);
+                        const resto = num.substring(4);
+                        return `(${ddd}) ${resto.substring(0, 5)}-${resto.substring(5)}`;
+                    }
+                    return `(${ddd}) ${num.substring(2, 7)}-${num.substring(7)}`;
+                }
+                return telefone;
+            }
+        }));
+
+        window.Alpine = Alpine;
+        Alpine.start();
+    </script>
+</body>
+</html>
