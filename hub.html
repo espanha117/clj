@@ -76,17 +76,27 @@
             </template>
         </div>
 
-        <div class="mt-12 mb-4 flex justify-center">
-            <button 
+        <div class="mt-12 mb-4 flex flex-wrap justify-center gap-4">
+            <button
                 onclick="window.location.href='adicionar.html'"
                 class="group relative inline-flex items-center gap-3 px-8 py-4 bg-slate-200 hover:bg-white text-slate-900 font-bold rounded-2xl transition-all duration-300 shadow-[0_0_20px_rgba(255,255,255,0.05)] hover:shadow-[0_0_30px_rgba(255,255,255,0.15)] hover:-translate-y-1 overflow-hidden"
             >
                 <div class="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/40 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></div>
-                
                 <svg class="w-6 h-6 relative z-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"></path>
                 </svg>
                 <span class="relative z-10 tracking-wide">Adicionar Novo Membro</span>
+            </button>
+
+            <button
+                onclick="window.location.href='editar.html'"
+                class="group relative inline-flex items-center gap-3 px-8 py-4 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-2xl border border-slate-700 hover:border-slate-500 transition-all duration-300 hover:-translate-y-1 overflow-hidden"
+            >
+                <div class="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/5 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></div>
+                <svg class="w-6 h-6 relative z-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                </svg>
+                <span class="relative z-10 tracking-wide">Editar Membros</span>
             </button>
         </div>
 

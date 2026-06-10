@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editar Membros - CLJ Diocese de Frederico Westphalen</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: { colors: { slate: { 850: '#151e2e', 950: '#0a0f1a' } } }
+            }
+        }
+    </script>
+</head>
+<body class="bg-slate-950 font-sans antialiased text-slate-200 relative min-h-screen">
+
+    <div class="fixed inset-0 opacity-[0.15] pointer-events-none z-0"
+         style="background-image: url('data:image/svg+xml,%3Csvg width=\'24\' height=\'24\' viewBox=\'0 0 24 24\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Ccircle cx=\'2\' cy=\'2\' r=\'1\' fill=\'%23ffffff\'/%3E%3C/svg%3E');"></div>
+    <div class="fixed top-[-20%] left-[-10%] w-96 h-96 bg-slate-400/10 rounded-full blur-[120px] pointer-events-none z-0"></div>
+    <div class="fixed bottom-[-20%] right-[-10%] w-[500px] h-[500px] bg-slate-300/5 rounded-full blur-[150px] pointer-events-none z-0"></div>
+
+    <header class="relative z-10 bg-slate-900/60 backdrop-blur-md border-b border-slate-800 sticky top-0">
+        <div class="max-w-3xl mx-auto px-4 sm:px-6 h-20 flex items-center justify-between">
+            <button onclick="window.location.href='hub.html'" class="text-sm font-medium text-slate-400 hover:text-white transition-colors flex items-center gap-2">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                Voltar ao Hub
+            </button>
+            <img src="assets/logo diocese sem fundo.png" alt="Logo CLJ" class="h-10 w-auto object-contain">
+        </div>
+    </header>
+
+    <main class="relative z-10 max-w-3xl mx-auto px-4 py-10" x-data="editarForm()">
+
+        <div class="mb-8">
+            <h2 class="text-2xl font-semibold text-slate-200">Editar Membros do PSP</h2>
+            <p class="text-slate-400 text-sm mt-1">Altere ou remova membros do diretório.</p>
+        </div>
+
+        <!-- Seletor de paróquia (só diocesano) -->
+        <div x-show="isAdmin" class="mb-6">
+            <label class="block text-sm font-medium text-slate-400 mb-2">Paróquia</label>
+            <div class="relative">
+                <select x-model="cidadeIdSelecionada" @change="carregarPorId($event.target.value)"
+                        class="w-full px-4 py-3 rounded-xl border border-slate-700/50 focus:ring-2 focus:ring-slate-400/30 focus:border-slate-400 outline-none transition-all text-slate-200 bg-slate-900/60 appearance-none cursor-pointer">
+                    <option value="">Selecione uma paróquia...</option>
+                    <template x-for="c in cidadesList" :key="c.id">
+                        <option :value="c.id" x-text="`${c.nome} — ${c.paroquia}`"></option>
+                    </template>
+                </select>
+                <div class="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none text-slate-500">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                </div>
+            </div>
+        </div>
+
+        <!-- Nome da paróquia (usuário comum) -->
+        <div x-show="!isAdmin && cidadeSelecionada" class="mb-6 px-4 py-3 rounded-xl bg-slate-900/60 border border-slate-700/50">
+            <p class="text-xs text-slate-500 uppercase tracking-wide mb-0.5">Paróquia</p>
+            <p class="font-semibold text-slate-100" x-text="cidadeSelecionada ? cidadeSelecionada.nome + ' — ' + cidadeSelecionada.paroquia : ''"></p>
+        </div>
+
+        <!-- Loading -->
+        <div x-show="carregando" class="flex justify-center py-16">
+            <svg class="animate-spin h-8 w-8 text-slate-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+        </div>
+
+        <!-- Sem paróquia selecionada -->
+        <div x-show="!carregando && !cidadeSelecionada && isAdmin" class="text-center py-16 text-slate-500">
+            <p>Selecione uma paróquia para ver os membros.</p>
+        </div>
+
+        <!-- Sem membros -->
+        <div x-show="!carregando && cidadeSelecionada && membros.length === 0" style="display:none;" class="text-center py-16 text-slate-500">
+            <svg class="w-12 h-12 mx-auto mb-3 opacity-40" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+            <p>Nenhum membro cadastrado.</p>
+        </div>
+
+        <!-- Lista de membros -->
+        <div x-show="!carregando && membros.length > 0" class="space-y-3">
+            <template x-for="membro in membros" :key="membro.id">
+                <div class="bg-slate-900/60 border border-slate-700/50 rounded-2xl p-4 sm:p-5 transition-colors">
+
+                    <!-- Modo visualização -->
+                    <div x-show="confirmandoDelete !== membro.id">
+                        <div class="flex items-start justify-between gap-4">
+                            <div class="flex-1 min-w-0">
+                                <span class="inline-block px-2.5 py-1 rounded-md bg-slate-700/50 text-xs font-medium text-slate-300 mb-2 border border-slate-600/50" x-text="membro.cargo"></span>
+                                <h3 class="font-semibold text-slate-100 text-base leading-tight" x-text="membro.nome"></h3>
+                                <p class="text-sm text-slate-400 mt-0.5" x-text="formatarTelefone(membro.telefone)"></p>
+                            </div>
+                            <div class="flex items-center gap-1 shrink-0">
+                                <button @click="abrirEdicao(membro)"
+                                        title="Editar"
+                                        class="p-2 rounded-lg text-slate-400 hover:text-slate-100 hover:bg-slate-700/60 transition-colors">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                                </button>
+                                <button @click="confirmandoDelete = membro.id"
+                                        title="Excluir"
+                                        class="p-2 rounded-lg text-slate-400 hover:text-red-400 hover:bg-red-400/10 transition-colors">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Confirmação de exclusão -->
+                    <div x-show="confirmandoDelete === membro.id" class="flex items-center justify-between gap-4">
+                        <p class="text-sm text-slate-300">Excluir <span class="font-semibold text-white" x-text="membro.nome"></span>?</p>
+                        <div class="flex gap-2 shrink-0">
+                            <button @click="confirmandoDelete = null"
+                                    class="px-3 py-1.5 text-sm rounded-lg border border-slate-600 text-slate-300 hover:bg-slate-700 transition-colors">
+                                Cancelar
+                            </button>
+                            <button @click="excluirMembro(membro.id)"
+                                    class="px-3 py-1.5 text-sm rounded-lg bg-red-500/20 border border-red-500/30 text-red-400 hover:bg-red-500/30 transition-colors font-medium">
+                                Excluir
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
+            </template>
+        </div>
+
+        <!-- Modal de edição -->
+        <div x-show="modalEditando" style="display:none;" class="fixed inset-0 z-50 flex items-center justify-center p-4" x-transition.opacity>
+            <div class="absolute inset-0 bg-slate-950/80 backdrop-blur-sm" @click="modalEditando = false"></div>
+            <div class="relative w-full max-w-md bg-slate-900 border border-slate-700/50 rounded-2xl shadow-2xl p-6"
+                 x-show="modalEditando"
+                 x-transition:enter="transition ease-out duration-300"
+                 x-transition:enter-start="opacity-0 translate-y-8"
+                 x-transition:enter-end="opacity-100 translate-y-0"
+                 x-transition:leave="transition ease-in duration-200"
+                 x-transition:leave-start="opacity-100 translate-y-0"
+                 x-transition:leave-end="opacity-0 translate-y-8">
+
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-lg font-bold text-white">Editar Membro</h3>
+                    <button @click="modalEditando = false" class="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-800 transition-colors">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                    </button>
+                </div>
+
+                <form @submit.prevent="salvarEdicao" class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-slate-400 mb-1.5">Nome</label>
+                        <input type="text" x-model="formEdit.nome" required
+                               class="w-full px-4 py-3 rounded-xl border border-slate-700/50 focus:ring-2 focus:ring-slate-400/30 focus:border-slate-400 outline-none transition-all text-slate-200 bg-slate-950/50">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-slate-400 mb-1.5">Cargo</label>
+                        <input type="text" x-model="formEdit.cargo" required
+                               class="w-full px-4 py-3 rounded-xl border border-slate-700/50 focus:ring-2 focus:ring-slate-400/30 focus:border-slate-400 outline-none transition-all text-slate-200 bg-slate-950/50">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-slate-400 mb-1.5">WhatsApp</label>
+                        <input type="tel" x-model="formEdit.telefone" required
+                               class="w-full px-4 py-3 rounded-xl border border-slate-700/50 focus:ring-2 focus:ring-slate-400/30 focus:border-slate-400 outline-none transition-all text-slate-200 bg-slate-950/50">
+                    </div>
+                    <div class="flex gap-3 pt-2">
+                        <button type="button" @click="modalEditando = false"
+                                class="flex-1 px-4 py-3 rounded-xl border border-slate-700 text-slate-300 hover:bg-slate-800 transition-colors font-medium">
+                            Cancelar
+                        </button>
+                        <button type="submit" :disabled="salvando"
+                                class="flex-1 relative bg-slate-200 hover:bg-white text-slate-900 font-bold py-3 rounded-xl transition-all disabled:opacity-70 overflow-hidden group">
+                            <div class="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/40 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></div>
+                            <span x-show="!salvando" class="relative z-10">Salvar</span>
+                            <span x-show="salvando" style="display:none;" class="relative z-10">Salvando...</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+    </main>
+
+    <script type="module">
+        import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+        import Alpine from 'https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/module.esm.js';
+        import { supabaseUrl, supabaseKey } from './config.js';
+
+        const supabase = createClient(supabaseUrl, supabaseKey);
+
+        Alpine.data('editarForm', () => ({
+            usuario: '',
+            isAdmin: false,
+            cidadesList: [],
+            cidadeSelecionada: null,
+            cidadeIdSelecionada: '',
+            membros: [],
+            carregando: false,
+            modalEditando: false,
+            membroEditando: null,
+            formEdit: { nome: '', cargo: '', telefone: '' },
+            salvando: false,
+            confirmandoDelete: null,
+
+            async init() {
+                if (!localStorage.getItem('clj_auth')) {
+                    window.location.href = 'login.html';
+                    return;
+                }
+                this.usuario = localStorage.getItem('clj_user') || '';
+                this.isAdmin = this.usuario === 'diocesano';
+
+                let query = supabase.from('cidades').select('id, nome, paroquia, sigla').order('nome');
+                if (!this.isAdmin) query = query.eq('sigla', this.usuario);
+
+                const { data } = await query;
+                if (data) {
+                    this.cidadesList = data;
+                    if (!this.isAdmin && data.length > 0) {
+                        await this.carregarMembros(data[0]);
+                    }
+                }
+            },
+
+            async carregarPorId(id) {
+                if (!id) { this.cidadeSelecionada = null; this.membros = []; return; }
+                const cidade = this.cidadesList.find(c => c.id === id);
+                if (cidade) await this.carregarMembros(cidade);
+            },
+
+            async carregarMembros(cidade) {
+                this.cidadeSelecionada = cidade;
+                this.carregando = true;
+                this.membros = [];
+                this.confirmandoDelete = null;
+
+                const { data } = await supabase
+                    .from('membros_psp')
+                    .select('id, nome, cargo, telefone, ordem')
+                    .eq('cidade_id', cidade.id);
+
+                if (data) this.membros = this.sortMembros(data);
+                this.carregando = false;
+            },
+
+            sortMembros(lista) {
+                const rank = c => {
+                    const l = c.toLowerCase();
+                    if (l === 'presidente') return 0;
+                    if (l.includes('vice')) return 1;
+                    return 2;
+                };
+                return [...lista].sort((a, b) => {
+                    const ra = rank(a.cargo), rb = rank(b.cargo);
+                    if (ra !== rb) return ra - rb;
+                    if (ra === 2) return (a.ordem ?? 999) - (b.ordem ?? 999);
+                    return 0;
+                });
+            },
+
+            abrirEdicao(membro) {
+                this.membroEditando = membro;
+                this.formEdit = { nome: membro.nome, cargo: membro.cargo, telefone: membro.telefone };
+                this.modalEditando = true;
+            },
+
+            async salvarEdicao() {
+                this.salvando = true;
+                const telefoneFinal = this.normalizarTelefone(this.formEdit.telefone);
+
+                const { error } = await supabase
+                    .from('membros_psp')
+                    .update({ nome: this.formEdit.nome, cargo: this.formEdit.cargo, telefone: telefoneFinal })
+                    .eq('id', this.membroEditando.id);
+
+                if (!error) {
+                    const idx = this.membros.findIndex(m => m.id === this.membroEditando.id);
+                    if (idx !== -1) {
+                        this.membros[idx] = { ...this.membros[idx], nome: this.formEdit.nome, cargo: this.formEdit.cargo, telefone: telefoneFinal };
+                        this.membros = this.sortMembros(this.membros);
+                    }
+                    this.modalEditando = false;
+                }
+                this.salvando = false;
+            },
+
+            async excluirMembro(id) {
+                const { error } = await supabase.from('membros_psp').delete().eq('id', id);
+                if (!error) {
+                    this.membros = this.membros.filter(m => m.id !== id);
+                    this.confirmandoDelete = null;
+                }
+            },
+
+            normalizarTelefone(raw) {
+                const num = raw.replace(/\D/g, '');
+                if (num.startsWith('55') && num.length >= 12) return num;
+                if (num.length === 11) return '55' + num;
+                if (num.length === 10) return '55' + num.slice(0, 2) + '9' + num.slice(2);
+                return num;
+            },
+
+            formatarTelefone(telefone) {
+                const num = telefone.replace(/\D/g, '');
+                if (num.length >= 12 && num.startsWith('55')) {
+                    const ddd = num.substring(2, 4);
+                    const resto = num.substring(4);
+                    return `(${ddd}) ${resto.substring(0, 5)}-${resto.substring(5)}`;
+                }
+                return telefone;
+            }
+        }));
+
+        window.Alpine = Alpine;
+        Alpine.start();
+    </script>
+</body>
+</html>
