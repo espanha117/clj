@@ -145,6 +145,14 @@
                 }
             },
 
+            normalizarTelefone(raw) {
+                const num = raw.replace(/\D/g, '');
+                if (num.startsWith('55') && num.length >= 12) return num;
+                if (num.length === 11) return '55' + num;
+                if (num.length === 10) return '55' + num.slice(0, 2) + '9' + num.slice(2);
+                return num;
+            },
+
             async salvarMembro() {
                 this.isLoading = true;
                 this.mensagem = { texto: '', erro: false };
@@ -154,7 +162,7 @@
                         nome: this.form.nome,
                         cidade_id: this.form.cidade_id,
                         cargo: this.form.cargo,
-                        telefone: this.form.telefone
+                        telefone: this.normalizarTelefone(this.form.telefone)
                     }]);
 
                     if (error) throw error;
