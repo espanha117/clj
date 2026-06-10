@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Usuários - CLJ Diocese de Frederico Westphalen</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: { extend: { colors: { slate: { 850: '#151e2e', 950: '#0a0f1a' } } } }
+        }
+    </script>
+    <style>[x-cloak] { display: none !important; }</style>
+</head>
+<body class="bg-slate-950 font-sans antialiased text-slate-200 relative min-h-screen">
+
+    <div class="fixed inset-0 opacity-[0.15] pointer-events-none z-0"
+         style="background-image: url('data:image/svg+xml,%3Csvg width=\'24\' height=\'24\' viewBox=\'0 0 24 24\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Ccircle cx=\'2\' cy=\'2\' r=\'1\' fill=\'%23ffffff\'/%3E%3C/svg%3E');"></div>
+    <div class="fixed top-[-20%] left-[-10%] w-96 h-96 bg-slate-400/10 rounded-full blur-[120px] pointer-events-none z-0"></div>
+    <div class="fixed bottom-[-20%] right-[-10%] w-[500px] h-[500px] bg-slate-300/5 rounded-full blur-[150px] pointer-events-none z-0"></div>
+
+    <header class="relative z-20 bg-slate-900/60 backdrop-blur-md border-b border-slate-800 sticky top-0">
+        <div class="max-w-3xl mx-auto px-4 sm:px-6 h-16 sm:h-20 flex items-center justify-between">
+            <button onclick="window.location.href='hub.html'" class="text-sm font-medium text-slate-400 hover:text-white transition-colors flex items-center gap-2 p-2 rounded-lg hover:bg-slate-800">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                <span class="hidden sm:inline">Voltar ao Hub</span>
+            </button>
+            <img src="assets/logo diocese sem fundo.png" alt="Logo CLJ" class="h-9 sm:h-10 w-auto object-contain">
+        </div>
+    </header>
+
+    <!-- Toast -->
+    <div x-data style="display:none;"
+         x-show="$store.toast.visivel"
+         x-transition:enter="transition ease-out duration-300"
+         x-transition:enter-start="opacity-0 translate-y-2"
+         x-transition:enter-end="opacity-100 translate-y-0"
+         x-transition:leave="transition ease-in duration-200"
+         x-transition:leave-start="opacity-100 translate-y-0"
+         x-transition:leave-end="opacity-0 translate-y-2"
+         :class="$store.toast.tipo === 'ok' ? 'border-green-500/30 text-green-300' : 'border-red-500/30 text-red-300'"
+         class="fixed bottom-6 right-4 sm:right-6 z-[200] px-4 py-3 rounded-xl shadow-2xl text-sm font-medium flex items-center gap-2.5 max-w-xs bg-slate-800 border">
+        <svg x-show="$store.toast.tipo === 'ok'" class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
+        <svg x-show="$store.toast.tipo === 'erro'" class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+        <span x-text="$store.toast.msg"></span>
+    </div>
+
+    <main class="relative z-10 max-w-3xl mx-auto px-4 py-10" x-data="usuariosForm()" x-cloak>
+
+        <div class="mb-8">
+            <h2 class="text-2xl font-semibold text-slate-200">Gerenciar Usuários</h2>
+            <p class="text-slate-400 text-sm mt-1">Crie, edite e remova usuários de paróquias.</p>
+        </div>
+
+        <!-- Criar novo usuário -->
+        <div class="bg-slate-900/60 border border-slate-700/50 rounded-2xl p-6 mb-8">
+            <h3 class="text-base font-semibold text-slate-200 mb-4 flex items-center gap-2">
+                <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                Novo Usuário
+            </h3>
+            <form @submit.prevent="criarUsuario" class="space-y-4">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-slate-400 mb-1.5">Paróquia</label>
+                        <div class="relative">
+                            <select x-model="novoUsuario.cidade_id" @change="preencherSigla()" required
+                                    class="w-full px-4 py-3 rounded-xl border border-slate-700/50 bg-slate-950/50 text-slate-200 appearance-none outline-none focus:ring-2 focus:ring-slate-400/30 focus:border-slate-400 transition-all cursor-pointer">
+                                <option value="">Selecione...</option>
+                                <template x-for="c in cidadesList" :key="c.id">
+                                    <option :value="c.id" :data-sigla="c.sigla" x-text="`${c.nome} — ${c.paroquia}`"></option>
+                                </template>
+                            </select>
+                            <div class="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none text-slate-500">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-slate-400 mb-1.5">Usuário (sigla)</label>
+                        <input type="text" x-model="novoUsuario.usuario" required placeholder="ex: nsa"
+                               class="w-full px-4 py-3 rounded-xl border border-slate-700/50 bg-slate-950/50 text-slate-200 placeholder-slate-600 outline-none focus:ring-2 focus:ring-slate-400/30 focus:border-slate-400 transition-all">
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-slate-400 mb-1.5">Senha</label>
+                        <input type="text" x-model="novoUsuario.senha" required placeholder="Mínimo 6 caracteres"
+                               class="w-full px-4 py-3 rounded-xl border border-slate-700/50 bg-slate-950/50 text-slate-200 placeholder-slate-600 outline-none focus:ring-2 focus:ring-slate-400/30 focus:border-slate-400 transition-all">
+                    </div>
+                    <div class="flex items-end">
+                        <button type="submit" :disabled="criando"
+                                class="w-full relative bg-slate-200 hover:bg-white text-slate-900 font-bold py-3 px-4 rounded-xl transition-all disabled:opacity-70 overflow-hidden group">
+                            <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></div>
+                            <span x-show="!criando" class="relative z-10">Criar Usuário</span>
+                            <span x-show="criando" style="display:none;" class="relative z-10">Criando...</span>
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <!-- Loading -->
+        <div x-show="carregando" style="display:none;" class="flex justify-center py-16">
+            <svg class="animate-spin h-8 w-8 text-slate-500" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+        </div>
+
+        <!-- Lista de usuários -->
+        <div x-show="!carregando && usuarios.length > 0" style="display:none;" class="space-y-3">
+            <h3 class="text-sm font-medium text-slate-500 uppercase tracking-wide mb-3">Usuários cadastrados</h3>
+            <template x-for="user in usuarios" :key="user.id">
+                <div class="bg-slate-900/60 border border-slate-700/50 rounded-2xl p-4 sm:p-5">
+
+                    <!-- Modo visualização -->
+                    <div x-show="editandoSenhaId !== user.id && confirmandoDeleteId !== user.id">
+                        <div class="flex items-center justify-between gap-4">
+                            <div>
+                                <p class="font-semibold text-slate-100" x-text="user.usuario"></p>
+                                <p class="text-sm text-slate-400" x-text="user.cidades?.nome ? user.cidades.nome + ' — ' + user.cidades.paroquia : 'Sem paróquia vinculada'"></p>
+                            </div>
+                            <div class="flex items-center gap-1 shrink-0">
+                                <button @click="editandoSenhaId = user.id; novaSenha = ''"
+                                        title="Alterar senha"
+                                        class="p-2 rounded-lg text-slate-400 hover:text-slate-100 hover:bg-slate-700/60 transition-colors">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"></path></svg>
+                                </button>
+                                <button @click="confirmandoDeleteId = user.id"
+                                        title="Excluir"
+                                        x-show="user.usuario !== 'diocesano'"
+                                        class="p-2 rounded-lg text-slate-400 hover:text-red-400 hover:bg-red-400/10 transition-colors">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Editar senha -->
+                    <div x-show="editandoSenhaId === user.id" style="display:none;" class="flex flex-wrap items-center gap-3">
+                        <p class="text-sm text-slate-300 shrink-0">Nova senha para <strong x-text="user.usuario"></strong>:</p>
+                        <input type="text" x-model="novaSenha" placeholder="Nova senha"
+                               class="flex-1 min-w-0 px-3 py-2 rounded-lg border border-slate-700/50 bg-slate-950/50 text-sm text-slate-200 placeholder-slate-600 outline-none focus:ring-1 focus:ring-slate-400/30">
+                        <div class="flex gap-2 shrink-0">
+                            <button @click="editandoSenhaId = null; novaSenha = ''"
+                                    class="px-3 py-1.5 text-sm rounded-lg border border-slate-600 text-slate-300 hover:bg-slate-700 transition-colors">
+                                Cancelar
+                            </button>
+                            <button @click="alterarSenha(user.id)"
+                                    class="px-3 py-1.5 text-sm rounded-lg bg-slate-200 text-slate-900 font-semibold hover:bg-white transition-colors">
+                                Salvar
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Confirmar exclusão -->
+                    <div x-show="confirmandoDeleteId === user.id" style="display:none;" class="flex flex-wrap items-center justify-between gap-3">
+                        <p class="text-sm text-slate-300">Excluir usuário <strong class="text-white" x-text="user.usuario"></strong>?</p>
+                        <div class="flex gap-2 shrink-0">
+                            <button @click="confirmandoDeleteId = null"
+                                    class="px-3 py-1.5 text-sm rounded-lg border border-slate-600 text-slate-300 hover:bg-slate-700 transition-colors">
+                                Cancelar
+                            </button>
+                            <button @click="excluirUsuario(user.id)"
+                                    class="px-3 py-1.5 text-sm rounded-lg bg-red-500/20 border border-red-500/30 text-red-400 hover:bg-red-500/30 transition-colors font-medium">
+                                Excluir
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
+            </template>
+        </div>
+
+        <!-- Histórico de alterações -->
+        <div class="mt-12">
+            <h3 class="text-sm font-medium text-slate-500 uppercase tracking-wide mb-4">Histórico de Alterações</h3>
+
+            <div x-show="carregandoHistorico" style="display:none;" class="flex justify-center py-8">
+                <svg class="animate-spin h-6 w-6 text-slate-600" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+            </div>
+
+            <div x-show="!carregandoHistorico && historicoIndisponivel" style="display:none;"
+                 class="text-center py-8 text-slate-600 text-sm bg-slate-900/40 rounded-2xl border border-slate-800">
+                Histórico indisponível. Execute o SQL de criação da tabela <code class="text-slate-400">historico_alteracoes</code> no Supabase.
+            </div>
+
+            <div x-show="!carregandoHistorico && !historicoIndisponivel && historico.length === 0" style="display:none;"
+                 class="text-center py-8 text-slate-600 text-sm">
+                Nenhuma alteração registrada ainda.
+            </div>
+
+            <div x-show="!carregandoHistorico && historico.length > 0" style="display:none;" class="space-y-2">
+                <template x-for="h in historico" :key="h.id">
+                    <div class="flex items-start gap-3 px-4 py-3 rounded-xl bg-slate-900/40 border border-slate-800/60">
+                        <div class="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center shrink-0 mt-0.5">
+                            <svg x-show="h.acao === 'adicionou'" class="w-3.5 h-3.5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"></path></svg>
+                            <svg x-show="h.acao === 'editou'" class="w-3.5 h-3.5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                            <svg x-show="h.acao === 'excluiu' || h.acao === 'desativou'" class="w-3.5 h-3.5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                            <svg x-show="h.acao === 'reativou'" class="w-3.5 h-3.5 text-teal-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <p class="text-sm text-slate-300">
+                                <span class="font-semibold text-slate-100" x-text="h.usuario_sigla"></span>
+                                <span x-text="' ' + h.acao + ' '"></span>
+                                <span class="font-semibold text-slate-100" x-text="h.membro_nome"></span>
+                                <span x-show="h.membro_cargo" class="text-slate-400" x-text="' (' + h.membro_cargo + ')'"></span>
+                                <span x-show="h.paroquia_nome" class="text-slate-400" x-text="' · ' + h.paroquia_nome"></span>
+                            </p>
+                            <p class="text-xs text-slate-500 mt-0.5" x-text="formatarData(h.criado_em)"></p>
+                        </div>
+                    </div>
+                </template>
+            </div>
+        </div>
+
+    </main>
+
+    <script type="module">
+        import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+        import Alpine from 'https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/module.esm.js';
+        import { supabaseUrl, supabaseKey } from './config.js';
+
+        const supabase = createClient(supabaseUrl, supabaseKey);
+
+        Alpine.store('toast', {
+            visivel: false, msg: '', tipo: 'ok', _t: null,
+            show(msg, tipo = 'ok') {
+                this.msg = msg; this.tipo = tipo; this.visivel = true;
+                clearTimeout(this._t);
+                this._t = setTimeout(() => { this.visivel = false; }, 3500);
+            }
+        });
+
+        Alpine.data('usuariosForm', () => ({
+            usuarios: [], cidadesList: [],
+            carregando: true, criando: false,
+            editandoSenhaId: null, novaSenha: '',
+            confirmandoDeleteId: null,
+            novoUsuario: { cidade_id: '', usuario: '', senha: '' },
+            historico: [], carregandoHistorico: true, historicoIndisponivel: false,
+
+            async init() {
+                if (!localStorage.getItem('clj_auth')) { window.location.href = 'login.html'; return; }
+                if (localStorage.getItem('clj_user') !== 'diocesano') { window.location.href = 'hub.html'; return; }
+
+                const [cidadesRes, usuariosRes] = await Promise.all([
+                    supabase.from('cidades').select('id, nome, paroquia, sigla').order('nome'),
+                    supabase.from('usuarios').select('id, usuario, cidade_id, cidades(nome, paroquia)').order('usuario')
+                ]);
+
+                if (!cidadesRes.error) this.cidadesList = cidadesRes.data || [];
+                if (!usuariosRes.error) this.usuarios = usuariosRes.data || [];
+                this.carregando = false;
+
+                this.carregarHistorico();
+            },
+
+            async carregarHistorico() {
+                this.carregandoHistorico = true;
+                try {
+                    const { data, error } = await supabase
+                        .from('historico_alteracoes')
+                        .select('*')
+                        .order('criado_em', { ascending: false })
+                        .limit(50);
+                    if (error) throw error;
+                    this.historico = data || [];
+                } catch {
+                    this.historicoIndisponivel = true;
+                } finally {
+                    this.carregandoHistorico = false;
+                }
+            },
+
+            preencherSigla() {
+                const cidade = this.cidadesList.find(c => c.id === this.novoUsuario.cidade_id);
+                if (cidade) this.novoUsuario.usuario = cidade.sigla;
+            },
+
+            async criarUsuario() {
+                if (!this.novoUsuario.usuario || !this.novoUsuario.senha) return;
+                this.criando = true;
+                try {
+                    const { data, error } = await supabase.from('usuarios').insert({
+                        usuario: this.novoUsuario.usuario,
+                        senha: this.novoUsuario.senha,
+                        cidade_id: this.novoUsuario.cidade_id || null
+                    }).select('id, usuario, cidade_id, cidades(nome, paroquia)').single();
+
+                    if (error) throw error;
+                    this.usuarios.push(data);
+                    this.novoUsuario = { cidade_id: '', usuario: '', senha: '' };
+                    Alpine.store('toast').show('Usuário criado com sucesso!');
+                } catch(e) {
+                    Alpine.store('toast').show(e.message?.includes('duplicate') ? 'Usuário já existe.' : 'Erro ao criar usuário.', 'erro');
+                } finally {
+                    this.criando = false;
+                }
+            },
+
+            async alterarSenha(userId) {
+                if (!this.novaSenha || this.novaSenha.length < 6) {
+                    Alpine.store('toast').show('Senha deve ter ao menos 6 caracteres.', 'erro'); return;
+                }
+                const { error } = await supabase.from('usuarios').update({ senha: this.novaSenha }).eq('id', userId);
+                if (!error) {
+                    Alpine.store('toast').show('Senha alterada.');
+                    this.editandoSenhaId = null;
+                    this.novaSenha = '';
+                } else {
+                    Alpine.store('toast').show('Erro ao alterar senha.', 'erro');
+                }
+            },
+
+            async excluirUsuario(userId) {
+                const { error } = await supabase.from('usuarios').delete().eq('id', userId);
+                if (!error) {
+                    this.usuarios = this.usuarios.filter(u => u.id !== userId);
+                    this.confirmandoDeleteId = null;
+                    Alpine.store('toast').show('Usuário excluído.');
+                } else {
+                    Alpine.store('toast').show('Erro ao excluir.', 'erro');
+                }
+            },
+
+            formatarData(iso) {
+                if (!iso) return '';
+                const d = new Date(iso);
+                return d.toLocaleDateString('pt-BR') + ' às ' + d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+            }
+        }));
+
+        window.Alpine = Alpine;
+        Alpine.start();
+    </script>
+</body>
+</html>

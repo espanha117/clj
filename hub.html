@@ -4,27 +4,35 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hub - CLJ Diocese de Frederico Westphalen</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#0a0f1a">
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        slate: {
-                            850: '#151e2e',
-                            950: '#0a0f1a',
-                        }
-                    }
-                }
-            }
+            theme: { extend: { colors: { slate: { 850: '#151e2e', 950: '#0a0f1a' } } } }
         }
     </script>
+    <style>
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(12px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+        .card-enter { animation: fadeInUp 0.35s ease both; }
+        @keyframes shimmer {
+            0%   { background-position: -200% 0; }
+            100% { background-position:  200% 0; }
+        }
+        .skeleton {
+            background: linear-gradient(90deg, #1e293b 25%, #2d3f55 50%, #1e293b 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.6s infinite;
+        }
+    </style>
 </head>
 <body class="bg-slate-950 font-sans antialiased text-slate-200 relative min-h-screen">
 
-    <div class="fixed inset-0 opacity-[0.15] pointer-events-none z-0" 
-         style="background-image: url('data:image/svg+xml,%3Csvg width=\'24\' height=\'24\' viewBox=\'0 0 24 24\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Ccircle cx=\'2\' cy=\'2\' r=\'1\' fill=\'%23ffffff\'/%3E%3C/svg%3E');">
-    </div>
+    <div class="fixed inset-0 opacity-[0.15] pointer-events-none z-0"
+         style="background-image: url('data:image/svg+xml,%3Csvg width=\'24\' height=\'24\' viewBox=\'0 0 24 24\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Ccircle cx=\'2\' cy=\'2\' r=\'1\' fill=\'%23ffffff\'/%3E%3C/svg%3E');"></div>
     <div class="fixed top-[-20%] left-[-10%] w-96 h-96 bg-slate-400/10 rounded-full blur-[120px] pointer-events-none z-0"></div>
     <div class="fixed bottom-[-20%] right-[-10%] w-[500px] h-[500px] bg-slate-300/5 rounded-full blur-[150px] pointer-events-none z-0"></div>
 
@@ -37,36 +45,97 @@
                     <p class="text-xs text-slate-400 uppercase tracking-wider">Secretariado</p>
                 </div>
             </div>
-
-            <button onclick="logout()" class="text-sm font-medium text-slate-400 hover:text-white transition-colors flex items-center gap-1.5 p-2 rounded-lg hover:bg-slate-800">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
-                <span class="hidden sm:inline">Sair</span>
-            </button>
+            <div class="flex items-center gap-1" x-data="{ get isAdmin(){ return localStorage.getItem('clj_user') === 'diocesano'; } }">
+                <button x-show="isAdmin" @click="$dispatch('open-busca')" style="display:none;"
+                        class="text-slate-400 hover:text-white p-2 rounded-lg hover:bg-slate-800 transition-colors" title="Busca global">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                </button>
+                <a x-show="isAdmin" href="usuarios.html" style="display:none;"
+                   class="text-slate-400 hover:text-white p-2 rounded-lg hover:bg-slate-800 transition-colors" title="Gerenciar usuários">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                </a>
+                <button @click="$dispatch('open-senha')"
+                        class="text-slate-400 hover:text-white p-2 rounded-lg hover:bg-slate-800 transition-colors" title="Alterar senha">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"></path></svg>
+                </button>
+                <button onclick="logout()" class="text-slate-400 hover:text-white p-2 rounded-lg hover:bg-slate-800 transition-colors flex items-center gap-1.5">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+                    <span class="hidden sm:inline text-sm font-medium">Sair</span>
+                </button>
+            </div>
         </div>
     </header>
 
-    <main class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10" x-data="hubData()">
-        
-        <div class="mb-8">
-            <h2 class="text-2xl font-semibold text-slate-200">Paróquias</h2>
-            <p class="text-slate-400 text-sm mt-1">Selecione uma cidade para gerenciar os contatos do PSP.</p>
+    <!-- Toast -->
+    <div x-data style="display:none;"
+         x-show="$store.toast.visivel"
+         x-transition:enter="transition ease-out duration-300"
+         x-transition:enter-start="opacity-0 translate-y-2"
+         x-transition:enter-end="opacity-100 translate-y-0"
+         x-transition:leave="transition ease-in duration-200"
+         x-transition:leave-start="opacity-100 translate-y-0"
+         x-transition:leave-end="opacity-0 translate-y-2"
+         :class="$store.toast.tipo === 'ok' ? 'border-green-500/30 text-green-300' : 'border-red-500/30 text-red-300'"
+         class="fixed bottom-6 right-4 sm:right-6 z-[200] px-4 py-3 rounded-xl shadow-2xl text-sm font-medium flex items-center gap-2.5 max-w-xs bg-slate-800 border">
+        <svg x-show="$store.toast.tipo === 'ok'" class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
+        <svg x-show="$store.toast.tipo === 'erro'" class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+        <span x-text="$store.toast.msg"></span>
+    </div>
+
+    <main class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10" x-data="hubData()"
+          @open-busca.window="modalBuscaAberto = true; $nextTick(() => $refs.inputBusca?.focus())"
+          @open-senha.window="modalSenha = true">
+
+        <!-- Filtro de paróquia -->
+        <div class="mb-6 flex items-center gap-3">
+            <div class="relative flex-1 max-w-xs">
+                <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                <input x-model="buscaParoquia" type="text" placeholder="Filtrar paróquia..."
+                       class="w-full pl-9 pr-8 py-2.5 rounded-xl border border-slate-700/50 bg-slate-900/60 text-sm text-slate-200 placeholder-slate-500 outline-none focus:ring-2 focus:ring-slate-500/30 focus:border-slate-500 transition-all">
+                <button x-show="buscaParoquia" @click="buscaParoquia=''" style="display:none;"
+                        class="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300 transition-colors">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            <span x-show="buscaParoquia && !carregandoHub" style="display:none;"
+                  class="text-xs text-slate-500 shrink-0"
+                  x-text="`${paroquiasFiltradas().length} resultado(s)`"></span>
         </div>
 
-        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 sm:gap-6">
-            <template x-for="paroquia in paroquias" :key="paroquia.sigla">
-                <button 
+        <!-- Skeletons -->
+        <div x-show="carregandoHub" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 sm:gap-6">
+            <template x-for="i in 8" :key="i">
+                <div class="flex flex-col rounded-2xl overflow-hidden border border-slate-800/60">
+                    <div class="w-full aspect-[4/3] skeleton"></div>
+                    <div class="p-4 bg-slate-900/60 space-y-2.5">
+                        <div class="h-4 skeleton rounded-lg w-3/4"></div>
+                        <div class="h-3 skeleton rounded-lg w-1/2"></div>
+                    </div>
+                </div>
+            </template>
+        </div>
+
+        <!-- Grid real -->
+        <div x-show="!carregandoHub" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 sm:gap-6" style="display:none;">
+            <template x-for="(paroquia, idx) in paroquiasFiltradas()" :key="paroquia.sigla">
+                <button
                     @click="abrirParoquia(paroquia)"
-                    class="group flex flex-col text-left bg-slate-900/60 backdrop-blur-sm border border-slate-800 rounded-2xl overflow-hidden hover:border-slate-600 transition-all duration-300 hover:shadow-[0_0_25px_rgba(255,255,255,0.05)] hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-slate-500"
-                >
+                    :style="{ animationDelay: (idx * 40) + 'ms' }"
+                    class="card-enter group flex flex-col text-left bg-slate-900/60 backdrop-blur-sm border border-slate-800 rounded-2xl overflow-hidden hover:border-slate-600 transition-all duration-300 hover:shadow-[0_0_25px_rgba(255,255,255,0.05)] hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-slate-500">
                     <div class="w-full aspect-[4/3] bg-slate-950 relative flex items-center justify-center overflow-hidden border-b border-slate-800">
                         <span class="absolute text-4xl font-bold text-slate-800 uppercase tracking-widest" x-text="paroquia.sigla"></span>
-                        <img
-                            :src="`assets/${paroquia.sigla}.jpg`"
-                            :alt="paroquia.cidade"
-                            class="absolute inset-0 w-full h-full object-cover z-10 opacity-70 group-hover:opacity-100 transition-opacity transition-transform duration-500 group-hover:scale-105"
-                            onerror="this.style.display='none'"
-                        >
+                        <img :src="`assets/${paroquia.sigla}.jpg`" :alt="paroquia.cidade"
+                             class="absolute inset-0 w-full h-full object-cover z-10 opacity-70 group-hover:opacity-100 transition-opacity duration-500 group-hover:scale-105 transition-transform"
+                             onerror="this.style.display='none'">
                         <div class="absolute inset-0 bg-gradient-to-t from-slate-900/80 to-transparent z-20"></div>
+                        <!-- Badges -->
+                        <div class="absolute top-2 right-2 z-30 flex items-center gap-1">
+                            <span x-show="!temPresidentePorCidade[paroquia.id]" style="display:none;"
+                                  title="Sem presidente cadastrado"
+                                  class="bg-amber-400/90 text-amber-950 text-[10px] font-bold px-1.5 py-0.5 rounded-full leading-none">!</span>
+                            <span class="bg-slate-950/70 backdrop-blur-sm text-slate-300 text-[10px] font-semibold px-2 py-0.5 rounded-full border border-slate-700/50"
+                                  x-text="(contagemPorCidade[paroquia.id] || 0) + ' ' + ((contagemPorCidade[paroquia.id] === 1) ? 'membro' : 'membros')"></span>
+                        </div>
                     </div>
                     <div class="p-4 sm:p-5 flex-1 flex flex-col justify-start">
                         <h3 class="text-base sm:text-lg font-semibold text-slate-200 group-hover:text-white transition-colors leading-tight" x-text="paroquia.cidade"></h3>
@@ -74,72 +143,85 @@
                     </div>
                 </button>
             </template>
+            <div x-show="paroquiasFiltradas().length === 0 && !carregandoHub" class="col-span-full text-center py-16 text-slate-500">
+                Nenhuma paróquia encontrada.
+            </div>
         </div>
 
         <div class="mt-12 mb-4 flex flex-col sm:flex-row justify-center gap-3 sm:gap-4">
-            <button
-                onclick="window.location.href='adicionar.html'"
-                class="group relative inline-flex items-center justify-center gap-3 px-8 py-4 bg-slate-200 hover:bg-white text-slate-900 font-bold rounded-2xl transition-all duration-300 shadow-[0_0_20px_rgba(255,255,255,0.05)] hover:shadow-[0_0_30px_rgba(255,255,255,0.15)] sm:hover:-translate-y-1 overflow-hidden"
-            >
-                <div class="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/40 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></div>
-                <svg class="w-6 h-6 relative z-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"></path>
-                </svg>
+            <button onclick="window.location.href='adicionar.html'"
+                    class="group relative inline-flex items-center justify-center gap-3 px-8 py-4 bg-slate-200 hover:bg-white text-slate-900 font-bold rounded-2xl transition-all duration-300 hover:shadow-[0_0_30px_rgba(255,255,255,0.15)] sm:hover:-translate-y-1 overflow-hidden">
+                <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></div>
+                <svg class="w-6 h-6 relative z-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"></path></svg>
                 <span class="relative z-10 tracking-wide">Adicionar Novo Membro</span>
             </button>
-
-            <button
-                onclick="window.location.href='editar.html'"
-                class="group relative inline-flex items-center justify-center gap-3 px-8 py-4 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-2xl border border-slate-700 hover:border-slate-500 transition-all duration-300 sm:hover:-translate-y-1 overflow-hidden"
-            >
-                <div class="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/5 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></div>
-                <svg class="w-6 h-6 relative z-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
-                </svg>
+            <button onclick="window.location.href='editar.html'"
+                    class="group relative inline-flex items-center justify-center gap-3 px-8 py-4 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-2xl border border-slate-700 hover:border-slate-500 transition-all duration-300 sm:hover:-translate-y-1 overflow-hidden">
+                <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></div>
+                <svg class="w-6 h-6 relative z-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
                 <span class="relative z-10 tracking-wide">Editar Membros</span>
             </button>
         </div>
 
-
-        <div x-show="modalAberto" style="display: none;" class="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6" x-transition.opacity>
+        <!-- Modal paróquia -->
+        <div x-show="modalAberto" style="display:none;" class="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6" x-transition.opacity>
             <div class="absolute inset-0 bg-slate-950/80 backdrop-blur-sm" @click="fecharModal()"></div>
-            
             <div class="relative w-full max-w-2xl bg-slate-900 border border-slate-700/50 rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]"
-                 x-show="modalAberto" 
+                 x-show="modalAberto"
                  x-transition:enter="transition ease-out duration-300"
                  x-transition:enter-start="opacity-0 translate-y-8"
                  x-transition:enter-end="opacity-100 translate-y-0"
                  x-transition:leave="transition ease-in duration-200"
                  x-transition:leave-start="opacity-100 translate-y-0"
                  x-transition:leave-end="opacity-0 translate-y-8">
-                
-                <div class="px-6 py-5 border-b border-slate-800 flex items-center justify-between bg-slate-900/50">
-                    <div>
-                        <h3 class="text-xl font-bold text-white" x-text="paroquiaSelecionada?.cidade"></h3>
-                        <p class="text-sm text-slate-400" x-text="paroquiaSelecionada?.padroeiro"></p>
+
+                <div class="px-4 sm:px-6 py-4 sm:py-5 border-b border-slate-800 flex items-center justify-between bg-slate-900/50 shrink-0">
+                    <div class="min-w-0 flex-1">
+                        <h3 class="text-lg sm:text-xl font-bold text-white truncate" x-text="paroquiaSelecionada?.cidade"></h3>
+                        <p class="text-sm text-slate-400 truncate" x-text="paroquiaSelecionada?.padroeiro"></p>
                     </div>
-                    <button @click="fecharModal()" class="text-slate-400 hover:text-white transition-colors p-2 rounded-lg hover:bg-slate-800">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-                    </button>
+                    <div class="flex items-center gap-1 ml-3 shrink-0">
+                        <button x-show="!carregandoMembros && membros.length > 0" @click="exportarCSV()"
+                                style="display:none;"
+                                class="text-slate-400 hover:text-white p-2 rounded-lg hover:bg-slate-800 transition-colors" title="Exportar CSV">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                        </button>
+                        <button @click="fecharModal()" class="text-slate-400 hover:text-white p-2 rounded-lg hover:bg-slate-800 transition-colors">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Filtro de cargo -->
+                <div x-show="!carregandoMembros && membros.length > 0" style="display:none;"
+                     class="px-4 sm:px-6 py-2.5 border-b border-slate-800/60 flex items-center gap-2 flex-wrap shrink-0">
+                    <button @click="filtroCargoModal = ''"
+                            :class="filtroCargoModal === '' ? 'bg-slate-600 text-white' : 'bg-slate-800/80 text-slate-400 hover:bg-slate-700'"
+                            class="px-3 py-1 rounded-full text-xs font-medium transition-colors">Todos</button>
+                    <template x-for="cargo in cargosUnicos()" :key="cargo">
+                        <button @click="filtroCargoModal = filtroCargoModal === cargo ? '' : cargo"
+                                :class="filtroCargoModal === cargo ? 'bg-slate-600 text-white' : 'bg-slate-800/80 text-slate-400 hover:bg-slate-700'"
+                                class="px-3 py-1 rounded-full text-xs font-medium transition-colors capitalize"
+                                x-text="cargo"></button>
+                    </template>
                 </div>
 
                 <div class="p-4 sm:p-6 overflow-y-auto flex-1">
-                    
                     <div x-show="carregandoMembros" class="flex flex-col items-center justify-center py-10">
-                        <svg class="animate-spin h-8 w-8 text-slate-500 mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <svg class="animate-spin h-8 w-8 text-slate-500 mb-4" fill="none" viewBox="0 0 24 24">
                             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                             <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                         </svg>
                         <p class="text-slate-400 text-sm">Buscando contatos...</p>
                     </div>
 
-                    <div x-show="!carregandoMembros && membros.length === 0" class="text-center py-10" style="display: none;">
+                    <div x-show="!carregandoMembros && membros.length === 0" style="display:none;" class="text-center py-10">
                         <svg class="w-12 h-12 text-slate-700 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
-                        <p class="text-slate-400">Nenhum membro do PSP cadastrado para esta cidade.</p>
+                        <p class="text-slate-400">Nenhum membro cadastrado.</p>
                     </div>
 
-                    <div x-show="!carregandoMembros && membros.length > 0" class="space-y-3" style="display: none;">
-                        <template x-for="membro in membros" :key="membro.id">
+                    <div x-show="!carregandoMembros && membros.length > 0" style="display:none;" class="space-y-3">
+                        <template x-for="membro in membrosFiltradosModal()" :key="membro.id">
                             <div class="flex flex-col sm:flex-row sm:items-center justify-between p-4 rounded-xl border border-slate-700/50 bg-slate-800/30 hover:bg-slate-800/60 transition-colors gap-4">
                                 <div>
                                     <span class="inline-block px-2.5 py-1 rounded-md bg-slate-700/50 text-xs font-medium text-slate-300 mb-2 border border-slate-600/50" x-text="membro.cargo"></span>
@@ -147,14 +229,13 @@
                                         <h4 class="text-lg font-semibold text-slate-200" x-text="membro.nome"></h4>
                                         <a x-show="isAdmin || paroquiaSelecionada?.sigla === usuario"
                                            :href="`editar.html?cidade=${paroquiaSelecionada?.id}`"
-                                           class="p-1 rounded text-slate-600 hover:text-slate-300 transition-colors shrink-0"
-                                           title="Editar membros">
+                                           style="display:none;"
+                                           class="p-1 rounded text-slate-600 hover:text-slate-300 transition-colors shrink-0" title="Editar membros">
                                             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
                                         </a>
                                     </div>
                                     <p class="text-sm text-slate-400 mt-0.5" x-text="formatarTelefone(membro.telefone)"></p>
                                 </div>
-
                                 <div class="flex items-center gap-2 w-full sm:w-auto sm:shrink-0">
                                     <div x-show="isAdmin && !ePresOuVice(membro.cargo)" class="flex flex-col gap-1">
                                         <button @click="moverMembro(membro, -1)" class="p-2 rounded text-slate-500 hover:text-slate-200 hover:bg-slate-700 transition-colors">
@@ -164,16 +245,112 @@
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                                         </button>
                                     </div>
-                                    <a :href="`https://wa.me/${limparTelefone(membro.telefone)}`" target="_blank" class="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-3 sm:py-2.5 rounded-lg bg-[#25D366]/10 hover:bg-[#25D366]/20 text-[#25D366] font-medium transition-colors border border-[#25D366]/20">
+                                    <a :href="`https://wa.me/${limparTelefone(membro.telefone)}`" target="_blank"
+                                       class="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-3 sm:py-2.5 rounded-lg bg-[#25D366]/10 hover:bg-[#25D366]/20 text-[#25D366] font-medium transition-colors border border-[#25D366]/20">
                                         <svg class="w-5 h-5 shrink-0" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 00-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
                                         Conversar
                                     </a>
                                 </div>
                             </div>
                         </template>
+                        <div x-show="filtroCargoModal && membrosFiltradosModal().length === 0" class="text-center py-8 text-slate-500 text-sm">
+                            Nenhum membro com esse cargo.
+                        </div>
                     </div>
-
                 </div>
+            </div>
+        </div>
+
+        <!-- Modal busca global -->
+        <div x-show="modalBuscaAberto" style="display:none;" class="fixed inset-0 z-50 flex items-start justify-center pt-[8vh] px-4" x-transition.opacity>
+            <div class="absolute inset-0 bg-slate-950/80 backdrop-blur-sm" @click="fecharBusca()"></div>
+            <div class="relative w-full max-w-xl bg-slate-900 border border-slate-700/50 rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[75vh]"
+                 x-show="modalBuscaAberto"
+                 x-transition:enter="transition ease-out duration-250"
+                 x-transition:enter-start="opacity-0 scale-95"
+                 x-transition:enter-end="opacity-100 scale-100"
+                 x-transition:leave="transition ease-in duration-200"
+                 x-transition:leave-start="opacity-100 scale-100"
+                 x-transition:leave-end="opacity-0 scale-95">
+                <div class="flex items-center gap-3 px-4 py-3 border-b border-slate-800 shrink-0">
+                    <svg class="w-4 h-4 text-slate-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                    <input x-ref="inputBusca" x-model="buscaGlobal"
+                           @input.debounce.300ms="buscarGlobal()"
+                           @keydown.escape="fecharBusca()"
+                           type="text" placeholder="Buscar membro em todas as paróquias..."
+                           class="flex-1 bg-transparent text-slate-200 placeholder-slate-500 outline-none text-sm">
+                    <span x-show="buscandoGlobal" style="display:none;" class="text-xs text-slate-500 shrink-0">Buscando...</span>
+                    <button x-show="buscaGlobal" @click="buscaGlobal = ''; resultadosBusca = [];" style="display:none;"
+                            class="text-slate-500 hover:text-slate-300 transition-colors">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                    </button>
+                </div>
+                <div class="overflow-y-auto flex-1">
+                    <p x-show="!buscaGlobal" class="text-center py-12 text-slate-500 text-sm">Digite um nome para buscar</p>
+                    <p x-show="buscaGlobal && !buscandoGlobal && resultadosBusca.length === 0" style="display:none;"
+                       class="text-center py-12 text-slate-500 text-sm">Nenhum resultado.</p>
+                    <template x-for="r in resultadosBusca" :key="r.id">
+                        <button class="w-full text-left px-4 py-3.5 hover:bg-slate-800/60 transition-colors border-b border-slate-800/40 last:border-0"
+                                @click="abrirParoquiaDoResultado(r)">
+                            <div class="flex items-center justify-between gap-3">
+                                <div class="min-w-0">
+                                    <p class="text-sm font-semibold text-slate-100 truncate" x-text="r.nome"></p>
+                                    <p class="text-xs text-slate-400 truncate" x-text="r.cargo + ' · ' + (r.cidades?.nome || '')"></p>
+                                </div>
+                                <p class="text-xs text-slate-500 shrink-0" x-text="formatarTelefone(r.telefone)"></p>
+                            </div>
+                        </button>
+                    </template>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal trocar senha -->
+        <div x-show="modalSenha" style="display:none;" class="fixed inset-0 z-50 flex items-center justify-center p-4" x-transition.opacity>
+            <div class="absolute inset-0 bg-slate-950/80 backdrop-blur-sm" @click="modalSenha = false"></div>
+            <div class="relative w-full max-w-sm bg-slate-900 border border-slate-700/50 rounded-2xl shadow-2xl p-6"
+                 x-show="modalSenha"
+                 x-transition:enter="transition ease-out duration-300"
+                 x-transition:enter-start="opacity-0 translate-y-8"
+                 x-transition:enter-end="opacity-100 translate-y-0"
+                 x-transition:leave="transition ease-in duration-200"
+                 x-transition:leave-start="opacity-100 translate-y-0"
+                 x-transition:leave-end="opacity-0 translate-y-8">
+                <div class="flex items-center justify-between mb-5">
+                    <h3 class="text-lg font-bold text-white">Alterar Senha</h3>
+                    <button @click="modalSenha = false" class="text-slate-400 hover:text-white p-2 rounded-lg hover:bg-slate-800 transition-colors">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                    </button>
+                </div>
+                <form @submit.prevent="salvarSenha" class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-slate-400 mb-1.5">Senha atual</label>
+                        <input type="password" x-model="senhaAtual" required autocomplete="current-password"
+                               class="w-full px-4 py-3 rounded-xl border border-slate-700/50 focus:ring-2 focus:ring-slate-400/30 focus:border-slate-400 outline-none transition-all text-slate-200 bg-slate-950/50">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-slate-400 mb-1.5">Nova senha</label>
+                        <input type="password" x-model="senhaNova" required minlength="6" autocomplete="new-password"
+                               class="w-full px-4 py-3 rounded-xl border border-slate-700/50 focus:ring-2 focus:ring-slate-400/30 focus:border-slate-400 outline-none transition-all text-slate-200 bg-slate-950/50">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-slate-400 mb-1.5">Confirmar nova senha</label>
+                        <input type="password" x-model="senhaConfirm" required autocomplete="new-password"
+                               class="w-full px-4 py-3 rounded-xl border border-slate-700/50 focus:ring-2 focus:ring-slate-400/30 focus:border-slate-400 outline-none transition-all text-slate-200 bg-slate-950/50">
+                    </div>
+                    <div class="flex gap-3 pt-1">
+                        <button type="button" @click="modalSenha = false"
+                                class="flex-1 px-4 py-3 rounded-xl border border-slate-700 text-slate-300 hover:bg-slate-800 transition-colors font-medium">
+                            Cancelar
+                        </button>
+                        <button type="submit" :disabled="salvandoSenha"
+                                class="flex-1 relative bg-slate-200 hover:bg-white text-slate-900 font-bold py-3 rounded-xl transition-all disabled:opacity-70 overflow-hidden group">
+                            <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></div>
+                            <span x-show="!salvandoSenha" class="relative z-10">Salvar</span>
+                            <span x-show="salvandoSenha" style="display:none;" class="relative z-10">Salvando...</span>
+                        </button>
+                    </div>
+                </form>
             </div>
         </div>
 
@@ -186,46 +363,60 @@
 
         const supabase = createClient(supabaseUrl, supabaseKey);
 
-        // Função de Logout fora do Alpine para o cabeçalho usar
         window.logout = () => {
             localStorage.removeItem('clj_auth');
-            window.location.href = 'login.html'; // Volta pro login
+            localStorage.removeItem('clj_user');
+            window.location.href = 'login.html';
         };
 
-        // Bloqueio de acesso direto sem login
-    if (!localStorage.getItem('clj_auth')) {
-        window.location.href = 'login.html';
-    }
+        if (!localStorage.getItem('clj_auth')) window.location.href = 'login.html';
+
+        Alpine.store('toast', {
+            visivel: false, msg: '', tipo: 'ok', _t: null,
+            show(msg, tipo = 'ok') {
+                this.msg = msg; this.tipo = tipo; this.visivel = true;
+                clearTimeout(this._t);
+                this._t = setTimeout(() => { this.visivel = false; }, 3500);
+            }
+        });
 
         Alpine.data('hubData', () => ({
-            paroquias: [],
-            modalAberto: false,
-            paroquiaSelecionada: null,
-            membros: [],
-            carregandoMembros: false,
-            isAdmin: false,
-            usuario: '',
+            paroquias: [], carregandoHub: true,
+            contagemPorCidade: {}, temPresidentePorCidade: {},
+            buscaParoquia: '',
+            modalAberto: false, paroquiaSelecionada: null,
+            membros: [], carregandoMembros: false,
+            filtroCargoModal: '',
+            isAdmin: false, usuario: '',
+            modalBuscaAberto: false, buscaGlobal: '', resultadosBusca: [], buscandoGlobal: false,
+            modalSenha: false, senhaAtual: '', senhaNova: '', senhaConfirm: '', salvandoSenha: false,
 
             async init() {
                 this.usuario = localStorage.getItem('clj_user') || '';
                 this.isAdmin = this.usuario === 'diocesano';
                 try {
-                    const { data, error } = await supabase
-                        .from('cidades')
-                        .select('*')
-                        .order('nome', { ascending: true });
-
-                    if (!error && data) {
-                        this.paroquias = data.map(c => ({
-                            id: c.id,
-                            cidade: c.nome,
-                            padroeiro: c.paroquia,
-                            sigla: c.sigla
-                        }));
+                    const [cRes, mRes] = await Promise.all([
+                        supabase.from('cidades').select('*').order('nome'),
+                        supabase.from('membros_psp').select('cidade_id, cargo')
+                    ]);
+                    if (!cRes.error && cRes.data) {
+                        this.paroquias = cRes.data.map(c => ({ id: c.id, cidade: c.nome, padroeiro: c.paroquia, sigla: c.sigla }));
                     }
-                } catch (err) {
-                    console.error("Erro ao carregar cidades:", err);
-                }
+                    if (!mRes.error && mRes.data) {
+                        mRes.data.forEach(m => {
+                            this.contagemPorCidade[m.cidade_id] = (this.contagemPorCidade[m.cidade_id] || 0) + 1;
+                            if ((m.cargo || '').toLowerCase().trim() === 'presidente')
+                                this.temPresidentePorCidade[m.cidade_id] = true;
+                        });
+                    }
+                } catch(e) { console.error(e); }
+                finally { this.carregandoHub = false; }
+            },
+
+            paroquiasFiltradas() {
+                if (!this.buscaParoquia.trim()) return this.paroquias;
+                const t = this.buscaParoquia.toLowerCase();
+                return this.paroquias.filter(p => p.cidade.toLowerCase().includes(t) || p.padroeiro.toLowerCase().includes(t));
             },
 
             async abrirParoquia(paroquia) {
@@ -233,72 +424,109 @@
                 this.modalAberto = true;
                 this.carregandoMembros = true;
                 this.membros = [];
-
+                this.filtroCargoModal = '';
                 try {
-                    const { data: membrosData, error: membrosError } = await supabase
-                        .from('membros_psp')
-                        .select('id, nome, cargo, telefone, ordem')
+                    const { data, error } = await supabase
+                        .from('membros_psp').select('id, nome, cargo, telefone, ordem')
                         .eq('cidade_id', paroquia.id);
+                    if (error) throw error;
+                    if (data) this.membros = this.sortMembros(data);
+                } catch(e) { console.error(e); }
+                finally { this.carregandoMembros = false; }
+            },
 
-                    if (membrosError) throw membrosError;
-                    if (membrosData) this.membros = this.sortMembros(membrosData);
-                } catch (error) {
-                    console.error("Erro ao buscar contatos:", error);
-                } finally {
-                    this.carregandoMembros = false;
+            cargosUnicos() {
+                return [...new Set(this.membros.map(m => m.cargo.toLowerCase().trim()))];
+            },
+
+            membrosFiltradosModal() {
+                if (!this.filtroCargoModal) return this.membros;
+                return this.membros.filter(m => m.cargo.toLowerCase().trim() === this.filtroCargoModal);
+            },
+
+            exportarCSV() {
+                const header = 'Nome,Cargo,Telefone\n';
+                const rows = this.membros.map(m => `"${m.nome}","${m.cargo}","${m.telefone}"`).join('\n');
+                const blob = new Blob(['﻿' + header + rows], { type: 'text/csv;charset=utf-8;' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `${this.paroquiaSelecionada?.cidade || 'contatos'}.csv`;
+                a.click();
+                URL.revokeObjectURL(url);
+                Alpine.store('toast').show('CSV baixado com sucesso.');
+            },
+
+            async buscarGlobal() {
+                const t = this.buscaGlobal.trim();
+                if (t.length < 2) { this.resultadosBusca = []; return; }
+                this.buscandoGlobal = true;
+                try {
+                    const { data } = await supabase
+                        .from('membros_psp')
+                        .select('id, nome, cargo, telefone, cidade_id, cidades(nome)')
+                        .ilike('nome', `%${t}%`)
+                        .limit(25);
+                    this.resultadosBusca = data || [];
+                } finally { this.buscandoGlobal = false; }
+            },
+
+            abrirParoquiaDoResultado(r) {
+                const p = this.paroquias.find(x => x.id === r.cidade_id);
+                if (p) { this.fecharBusca(); this.abrirParoquia(p); }
+            },
+
+            fecharBusca() {
+                this.modalBuscaAberto = false;
+                this.buscaGlobal = '';
+                this.resultadosBusca = [];
+            },
+
+            async salvarSenha() {
+                if (this.senhaNova !== this.senhaConfirm) {
+                    Alpine.store('toast').show('As senhas não coincidem.', 'erro'); return;
                 }
+                this.salvandoSenha = true;
+                try {
+                    const { data: ok } = await supabase.rpc('validar_login', { p_usuario: this.usuario, p_senha: this.senhaAtual });
+                    if (!ok) { Alpine.store('toast').show('Senha atual incorreta.', 'erro'); return; }
+                    const { error } = await supabase.from('usuarios').update({ senha: this.senhaNova }).eq('usuario', this.usuario);
+                    if (error) throw error;
+                    Alpine.store('toast').show('Senha alterada com sucesso!');
+                    this.modalSenha = false;
+                    this.senhaAtual = ''; this.senhaNova = ''; this.senhaConfirm = '';
+                } catch { Alpine.store('toast').show('Erro ao alterar senha.', 'erro'); }
+                finally { this.salvandoSenha = false; }
             },
 
             sortMembros(lista) {
-                const rank = c => {
-                    const l = c.toLowerCase().trim();
-                    if (l === 'presidente') return 0;
-                    if (l === 'vice presidente' || l === 'vice-presidente') return 1;
-                    return 2;
-                };
-                return [...lista].sort((a, b) => {
-                    const ra = rank(a.cargo), rb = rank(b.cargo);
-                    if (ra !== rb) return ra - rb;
-                    if (ra === 2) return (a.ordem ?? 999) - (b.ordem ?? 999);
-                    return 0;
-                });
+                const rank = c => { const l = c.toLowerCase().trim(); if (l==='presidente') return 0; if (l==='vice presidente'||l==='vice-presidente') return 1; return 2; };
+                return [...lista].sort((a,b) => { const ra=rank(a.cargo),rb=rank(b.cargo); if(ra!==rb) return ra-rb; if(ra===2) return (a.ordem??999)-(b.ordem??999); return 0; });
             },
 
-            ePresOuVice(cargo) {
-                const c = cargo.toLowerCase().trim();
-                return c === 'presidente' || c === 'vice presidente' || c === 'vice-presidente';
-            },
+            ePresOuVice(cargo) { const c=cargo.toLowerCase().trim(); return c==='presidente'||c==='vice presidente'||c==='vice-presidente'; },
 
             async moverMembro(membro, direcao) {
                 const outros = this.membros.filter(m => !this.ePresOuVice(m.cargo));
                 const idx = outros.findIndex(m => m.id === membro.id);
                 const swapIdx = idx + direcao;
                 if (swapIdx < 0 || swapIdx >= outros.length) return;
-
-                const a = outros[idx];
-                const b = outros[swapIdx];
-
+                const a = outros[idx], b = outros[swapIdx];
                 await Promise.all([
                     supabase.from('membros_psp').update({ ordem: swapIdx * 10 }).eq('id', a.id),
                     supabase.from('membros_psp').update({ ordem: idx * 10 }).eq('id', b.id)
                 ]);
-
-                a.ordem = swapIdx * 10;
-                b.ordem = idx * 10;
+                a.ordem = swapIdx * 10; b.ordem = idx * 10;
                 this.membros = this.sortMembros(this.membros);
             },
 
             fecharModal() {
                 this.modalAberto = false;
-                setTimeout(() => {
-                    this.paroquiaSelecionada = null;
-                    this.membros = [];
-                }, 300);
+                this.filtroCargoModal = '';
+                setTimeout(() => { this.paroquiaSelecionada = null; this.membros = []; }, 300);
             },
 
-            limparTelefone(telefone) {
-                return telefone.replace(/\D/g, '');
-            },
+            limparTelefone(t) { return t.replace(/\D/g, ''); },
 
             formatarTelefone(telefone) {
                 const num = this.limparTelefone(telefone);

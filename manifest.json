@@ -1,0 +1,17 @@
+{
+    "name": "CLJ Diocese de Frederico Westphalen",
+    "short_name": "CLJ",
+    "description": "Gestão de contatos PSP",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#0a0f1a",
+    "theme_color": "#0a0f1a",
+    "icons": [
+        {
+            "src": "assets/logo diocese sem fundo.png",
+            "sizes": "any",
+            "type": "image/png",
+            "purpose": "any"
+        }
+    ]
+}
